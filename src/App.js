@@ -1,44 +1,39 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import Lists from './components/Lists/Lists';
 import './App.css';
 
 const App = () => {
   let [isLoading, setIsLoading] = useState(false);
-  let [data, setData] = useState([]);
+  let [items, setItems] = useState([]);
+  let groupedItems = {};
 
   useEffect(() => {
     setIsLoading(true);
-    fetchList();
-    setIsLoading(false);
+    axios.get('./list.JSON')
+      .then((response)=> {
+        groupItems(response.data);
+        sortLists();
+        setItems(groupedItems);
+        setIsLoading(false);
+      })
+      .catch((error)=> console.log(error))
   }, []);
 
-  let fetchList = () => {
-    let dataObject = {};
-    axios.get('./list.JSON')
-      .then((response) => {
-        populateObject(dataObject, response);
-        sortLists(dataObject);
-        setData(dataObject);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
-
-  let populateObject = (object, array) => {
-    array.data.forEach((item) => {
-      if(object[item.listId] && item.name) {
-        object[item.listId].push(item);
-      } else if(!object[item.listId] && item.name) {
-        object[item.listId] = [item];
+  let groupItems = (array) => {
+    array.forEach((item) => {
+      if(groupedItems[item.listId] && item.name) {
+        groupedItems[item.listId].push(item);
+      } else if(!groupedItems[item.listId] && item.name) {
+        groupedItems[item.listId] = [item];
       }
     });
   };
 
-  let sortLists = (dataObject) => {
-    for (const listId in dataObject) {
-      if (dataObject.hasOwnProperty(listId)) {
-        dataObject[listId].sort((a, b) => {
+  let sortLists = () => {
+    for (const listId in groupedItems) {
+      if (groupedItems.hasOwnProperty(listId)) {
+        groupedItems[listId].sort((a, b) => {
           let aNumber = a.name.split(' ');
           let bNumber = b.name.split(' ');
           let aInt = parseInt(aNumber[1]);
@@ -51,12 +46,7 @@ const App = () => {
 
   return (
     <div>
-      {Object.keys(data).map(function(key) {
-        return <div key={key}>
-          <h1>List {key}</h1>
-      {data[key].map((item) => <p key={item.id}>{item.id} {item.listId} {item.name}</p>)}
-        </div>
-      })}
+      <Lists lists={items}/>
     </div>
   );
 };
