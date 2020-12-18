@@ -16,19 +16,8 @@ const App = () => {
     let dataObject = {};
     axios.get('./list.JSON')
       .then((response) => {
-        response.data.forEach((item) => {
-          if(dataObject[item.listId] && item.name) {
-            dataObject[item.listId].push(item);
-          } else if(!dataObject[item.listId] && item.name) {
-            dataObject[item.listId] = [item];
-          }
-        });
-        for (const listId in dataObject) {
-          if (dataObject.hasOwnProperty(listId)) {
-            const element = dataObject[listId];
-            sortList(element);
-          }
-        }
+        populateObject(dataObject, response);
+        sortLists(dataObject);
         setData(dataObject);
       })
       .catch((err) => {
@@ -36,14 +25,28 @@ const App = () => {
       });
   };
 
-  let sortList = (list) => {
-    list.sort((a, b) => {
-      let aNumber = a.name.split(' ');
-      let bNumber = b.name.split(' ');
-      let aInt = parseInt(aNumber[1]);
-      let bInt = parseInt(bNumber[1]);
-      return (aInt > bInt) ? 1 : -1;
+  let populateObject = (object, array) => {
+    array.data.forEach((item) => {
+      if(object[item.listId] && item.name) {
+        object[item.listId].push(item);
+      } else if(!object[item.listId] && item.name) {
+        object[item.listId] = [item];
+      }
     });
+  };
+
+  let sortLists = (dataObject) => {
+    for (const listId in dataObject) {
+      if (dataObject.hasOwnProperty(listId)) {
+        dataObject[listId].sort((a, b) => {
+          let aNumber = a.name.split(' ');
+          let bNumber = b.name.split(' ');
+          let aInt = parseInt(aNumber[1]);
+          let bInt = parseInt(bNumber[1]);
+          return (aInt > bInt) ? 1 : -1;
+        });
+      }
+    }
   };
 
   return (
