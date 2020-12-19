@@ -1,30 +1,31 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Lists from './components/Lists/Lists';
+
 import './App.css';
 
 const App = () => {
   let [isLoading, setIsLoading] = useState(false);
-  let [items, setItems] = useState([]);
+  let [items, setItems] = useState({});
   let groupedItems = {};
 
   useEffect(() => {
     setIsLoading(true);
     axios.get('./list.JSON')
-      .then((response)=> {
+      .then((response) => {
         groupItems(response.data);
         sortLists();
         setItems(groupedItems);
         setIsLoading(false);
       })
-      .catch((error)=> console.log(error))
+      .catch((error) => console.log(error))
   }, []);
 
   let groupItems = (array) => {
     array.forEach((item) => {
-      if(groupedItems[item.listId] && item.name) {
+      if (groupedItems[item.listId] && item.name) {
         groupedItems[item.listId].push(item);
-      } else if(!groupedItems[item.listId] && item.name) {
+      } else if (!groupedItems[item.listId] && item.name) {
         groupedItems[item.listId] = [item];
       }
     });
@@ -45,18 +46,20 @@ const App = () => {
   };
 
   return (
-    <div>
-      <Lists lists={items}/>
+    <div className="app">
+      {
+        isLoading ?
+          <div>Loading...</div> :
+          (
+            <div>
+              <h1 className="header">Items List</h1>
+              <Lists lists={items} />
+            </div>
+          )
+      }
     </div>
   );
 };
 
 export default App;
 
-  {/* {
-    isLoading ?
-      <div>Loading...</div> :
-    (
-      <div></div>
-    )
-  } */}

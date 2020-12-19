@@ -1,0 +1,63 @@
+.list-card-container {
+    background-color: rgb(161 205 244 / 65%);  
+    backdrop-filter: blur(5px);
+    margin: 70px;
+    padding: 30px;
+    border-radius: 23px;
+    width: 340px;
+    height: 450px;
+    box-shadow: 20px 30px 43px rgb(45 45 45 / 42%);
+}
+
+.list-card-header {
+    text-align: center;
+    color: white;
+}
+
+.list-table-container {
+    max-height: 330px;
+    overflow-y: auto;
+    margin-top: 30px;
+    border-radius: 11px;
+}
+
+.list-table {
+    width: 100%;
+    border-collapse: collapse; 
+    position: relative;
+}
+
+.list-table th {
+    position: sticky;
+    top: 0;
+}
+
+table:first-child th{
+    border-top: none;
+}
+
+.list-item {
+    border: 1px solid #EEEEEE;
+    background-color: white;
+    text-align: center;
+    padding: 10px;
+}
+.list-item-1 {
+    width: 30%;
+}
+
+.list-item-2 {
+    width: 30%;
+}
+
+.list-item-3 {
+    width: 40%;
+}
+
+@media only screen and (max-width: 600px) {
+    .list-card-container {
+        margin: 12px;
+        padding: 16px;
+        margin-top: 30px;
+    }
+  }
