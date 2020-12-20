@@ -33,15 +33,13 @@ const App = () => {
 
   let sortLists = () => {
     for (const listId in groupedItems) {
-      if (groupedItems.hasOwnProperty(listId)) {
-        groupedItems[listId].sort((a, b) => {
-          let aNumber = a.name.split(' ');
-          let bNumber = b.name.split(' ');
-          let aInt = parseInt(aNumber[1]);
-          let bInt = parseInt(bNumber[1]);
-          return (aInt > bInt) ? 1 : -1;
-        });
-      }
+      groupedItems[listId].sort((a, b) => {
+        let aNumber = a.name.split(' ');
+        let bNumber = b.name.split(' ');
+        let aInt = parseInt(aNumber[1]);
+        let bInt = parseInt(bNumber[1]);
+        return (aInt > bInt) ? 1 : -1;
+      });
     }
   };
 

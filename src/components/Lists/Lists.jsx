@@ -7,7 +7,7 @@ const Lists = ({lists}) => {
   return (
     <div className="lists-container">
      {Object.keys(lists).map(function(key) {
-        return <List list={lists[key]}/>
+        return <List key={key} list={lists[key]}/>
       })}
     </div>
   );
