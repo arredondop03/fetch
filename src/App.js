@@ -13,10 +13,12 @@ const App = () => {
 
   useEffect(() => {
     setIsLoading(true);
+
     axios.get('./list.JSON')
       .then((response) => {
         groupItems(response.data);
         sortLists();
+
         setItems(groupedItems);
         setDefaultItems(groupedItems);
         setIsLoading(false);
@@ -24,24 +26,24 @@ const App = () => {
       .catch((error) => console.log(error))
   }, []);
 
-  let groupItems = (array) => {
-    array.forEach((item) => {
-      if (groupedItems[item.listId] && item.name) {
-        groupedItems[item.listId].push(item);
-      } else if (!groupedItems[item.listId] && item.name) {
-        groupedItems[item.listId] = [item];
+  let groupItems = (data) => {
+    data.forEach((item) => {
+      if (item.name) {
+        if (groupedItems[item.listId]) {
+          groupedItems[item.listId].push(item);
+        } else {
+          groupedItems[item.listId] = [item];
+        }
       }
     });
   };
 
   let sortLists = () => {
     for (const listId in groupedItems) {
-      groupedItems[listId].sort((a, b) => {
-        let aNumber = a.name.split(' ');
-        let bNumber = b.name.split(' ');
-        let aInt = parseInt(aNumber[1]);
-        let bInt = parseInt(bNumber[1]);
-        return (aInt > bInt) ? 1 : -1;
+      groupedItems[listId].sort((itemOne, itemTwo) => {
+        let itemOneNumber = parseInt(itemOne.name.split(' ')[1]);
+        let itemTwoNumber = parseInt(itemTwo.name.split(' ')[1]);
+        return itemOneNumber > itemTwoNumber ? 1 : -1;
       });
     }
   };
@@ -59,8 +61,9 @@ const App = () => {
   return (
     <div className="app">
       {
-        isLoading ?
-          <h3 className="loading">Loading...</h3> :
+        isLoading
+          ? <h3 className="loading">Loading...</h3>
+          :
           (
             <div>
               <h1 className="header">Items List</h1>
