@@ -49,7 +49,7 @@ const App = () => {
     <div className="app">
       {
         isLoading ?
-          <div>Loading...</div> :
+          <h3 className="loading">Loading...</h3> :
           (
             <div>
               <h1 className="header">Items List</h1>
