@@ -7,15 +7,33 @@
   padding: 30px;
 }
 
-.header {
-  text-align: center;
-  margin-top: 40px;
+.lists-view {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-.loading {
+.header {
+  text-align: center;
+  margin: 40px 0px;
+}
+
+.message-for-user {
   width: 100%;
   margin: 40px;
   text-align: center;
+}
+
+.search-bar {
+  width: 300px;
+  height: 45px;
+  background-color: rgb(161 205 244 / 65%);
+  border: none;
+  backdrop-filter: blur(5px);
+  border-radius: 11px;
+  color: white;
+  padding: 20px;
+  font-size: 20px;
 }
 
 @media only screen and (max-width: 600px) {

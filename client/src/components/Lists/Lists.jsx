@@ -1,16 +1,21 @@
 import React from 'react';
-import List from './../List/List';
+import PropTypes from 'prop-types';
+
+import List from '../List/List';
 import './Lists.css';
 
-const Lists = ({lists}) => {
-  return (
-    <div className="lists-container">
-     {
-      Object.keys(lists).map(function(key) {
-          return <List key={key} list={lists[key]}/>
-      })}
-    </div>
-  );
-};
+const Lists = ({ lists }) => (
+  <div className="lists-container">
+    {Object.keys(lists).map((key) => <List key={key} list={lists[key]} />)}
+  </div>
+);
 
 export default Lists;
+
+Lists.propTypes = {
+  lists: PropTypes.objectOf(PropTypes.array),
+};
+
+Lists.defaultProps = {
+  lists: {},
+};
