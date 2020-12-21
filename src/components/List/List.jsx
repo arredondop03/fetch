@@ -1,5 +1,6 @@
 import React from 'react';
 import './List.css';
+
 const List = ({list}) => {
   return (
     <div className="list-card-container">

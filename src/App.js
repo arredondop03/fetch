@@ -6,55 +6,59 @@ import './App.css';
 
 const App = () => {
   let [isLoading, setIsLoading] = useState(false);
+  let [defaultItems, setDefaultItems] = useState({});
   let [items, setItems] = useState({});
-  let [name, setNames] = useState('');
-  let [defaultItems, setDefaultItems] = useState('');
-  let groupedItems = {};
 
   useEffect(() => {
     setIsLoading(true);
 
     axios.get('./list.JSON')
       .then((response) => {
-        groupItems(response.data);
-        sortLists();
+        const responseItems = response.data
+          .filter((item) => item.name)
+          .sort(itemComparator);
+
+        const groupedItems = groupItems(responseItems);
 
         setItems(groupedItems);
         setDefaultItems(groupedItems);
-        setIsLoading(false);
       })
       .catch((error) => console.log(error))
+      .finally(() => setIsLoading(false));
   }, []);
 
-  let groupItems = (data) => {
-    data.forEach((item) => {
-      if (item.name) {
-        if (groupedItems[item.listId]) {
-          groupedItems[item.listId].push(item);
-        } else {
-          groupedItems[item.listId] = [item];
-        }
-      }
-    });
-  };
+  let itemComparator = ((itemOne, itemTwo) => {
+    const itemOneNumber = parseInt(itemOne.name.split(' ')[1]);
+    const itemTwoNumber = parseInt(itemTwo.name.split(' ')[1]);
 
-  let sortLists = () => {
-    for (const listId in groupedItems) {
-      groupedItems[listId].sort((itemOne, itemTwo) => {
-        let itemOneNumber = parseInt(itemOne.name.split(' ')[1]);
-        let itemTwoNumber = parseInt(itemTwo.name.split(' ')[1]);
-        return itemOneNumber > itemTwoNumber ? 1 : -1;
-      });
-    }
-  };
+    return itemOneNumber - itemTwoNumber;
+  });
+
+  let groupItems = (responseItems) => {
+    const groupedItems = {};
+
+    responseItems.forEach((item) => 
+      groupedItems[item.listId]
+        ? groupedItems[item.listId].push(item)
+        : groupedItems[item.listId] = [item]
+    );
+
+    return groupedItems;
+  }
+
 
   let searchName = (event) => {
-    setNames(event.target.value);
-    let filteredList = {};
+    const filteredList = {};
 
     for (const key in defaultItems) {
-        filteredList[key] = defaultItems[key].filter((item) => item.name.includes(event.target.value));
-    };
+      const tempItemsList = defaultItems[key]
+        .filter((item) => item.name.includes(event.target.value));
+        
+      if (tempItemsList.length > 0) {
+        filteredList[key] = tempItemsList;
+      };
+    }
+
     setItems(filteredList);
   };
 
@@ -67,10 +71,7 @@ const App = () => {
           (
             <div>
               <h1 className="header">Items List</h1>
-              <input 
-                value={name}
-                onChange={searchName}
-              />
+              <input onChange={searchName} />
               <Lists lists={items} />
             </div>
           )
