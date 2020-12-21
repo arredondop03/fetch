@@ -1,90 +1,42 @@
-// import React from 'react';
-// import ReactDOM from 'react-dom';
-// import { act } from 'react-dom/test-utils';
-// import { mount } from 'enzyme';
-
-// import axios from 'axios';
-
-// import App from './App';
-
-// // let container;
-
-// // beforeEach(() => {
-// //   container = document.createElement('div');
-// //   document.body.appendChild(container);
-// // });
-
-// // afterEach(() => {
-// //   document.body.removeChild(container);
-// //   container = null;
-// // });
-
-// // it('can render and notify the user of a loading state', () => {
-// //   act(() => {
-// //     ReactDOM.render(<App />, container);
-// //   });
-
-// //   const loadingStatus = container.querySelector('.loading');
-// //   expect(loadingStatus.textContent).toBe('Loading...');
-// // });
-
-// it('can render and update item lists', () => {
-//   jest
-//     .spyOn(axios, 'get')
-//     .mockImplementation(() => Promise.resolve(
-//       {
-//         data: [
-//           {"id": 755, "listId": 2, "name": ""},
-//           {"id": 684, "listId": 1, "name": "Item 684"},
-//           {"id": 906, "listId": 2, "name": "Item 906"},
-//           {"id": 735, "listId": 1, "name": "Item 735"},
-//         ]
-//     }));
-
-//   // await act(async () => {
-//   //   ReactDOM.render(<App />, container);
-//   // });
-
-//   // const header = container.querySelector('h1');
-//   // expect(header.textContent).toBe('Items List');
-
-//   // const lists = container.querySelector('.lists');
-//   // console.log(lists.textContent);
-
-//   const wrapper = mount(<App />);
-
-//   // wrapper.update();
-//   console.log(wrapper.instance())
-// });
-
-
 import React from 'react';
-import { shallow } from 'enzyme';
-import App from './App';
-jest.mock('axios', () => {
-  return {
-    __esModule: true,
-    default: jest.fn()
-  }
-});
+import axiosMock from 'axios';
 
-describe('MockComponentEnzyme', ()=>{
-  it('should get data', (done) => {
-    const axios = require('axios');
-    jest.spyOn(axios, 'default').mockResolvedValue([
-      {"id": 755, "listId": 2, "name": ""},
-      {"id": 684, "listId": 1, "name": "Item 684"},
-      {"id": 906, "listId": 2, "name": "Item 906"},
-      {"id": 735, "listId": 1, "name": "Item 735"},
-    ])
-    const wrapper = shallow(<App/>, {
-      disableLifecycleMethods: true
+import { cleanup, render, waitFor } from '@testing-library/react';
+import { act } from 'react-dom/test-utils';
+
+import App from './App';
+
+describe('<App />', () => {
+  afterEach(() => cleanup());
+
+  it('requests item data and renders the page', async () => {
+    axiosMock.get.mockResolvedValue({ data: [] });
+    const url = 'http://localhost:3001/items';
+    const { getByText } = render(<App />);
+
+    expect(getByText(/Loading.../i).textContent).toBe('Loading...');
+
+    const resolvedHeader = await waitFor(() => getByText('Items List'));
+
+    expect((resolvedHeader).textContent).toBe('Items List');
+
+    expect(axiosMock.get).toHaveBeenCalledTimes(1);
+    expect(axiosMock.get).toHaveBeenCalledWith(url);
+  });
+
+  it('rejects the axios request and reports an error', async () => {
+    axiosMock.get.mockRejectedValue('Async error');
+
+    const url = 'http://localhost:3001/items';
+
+    const { getByText } = render(<App />);
+
+    expect(getByText(/Loading.../i).textContent).toBe('Loading...');
+
+    await act(async () => {
+      expect(axiosMock.get).toHaveBeenCalledTimes(1);
+      expect(axiosMock.get).toHaveBeenCalledWith(url);
+      await expect(axiosMock.get).rejects.toEqual('Async error');
     });
-    wrapper.instance().componentDidMount();
-    process.nextTick(()=>{
-      // expect(wrapper.state('error')).toBeFalsy();
-      expect(wrapper.state().items).toEqual('abc');
-      done();
-    })
-  })
-})
+  });
+});
