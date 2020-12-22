@@ -11,3 +11,13 @@ npm install
 npm run dependencies
 npm start
 ```
+
+## To run tests
+
+Run the following in the terminal:
+
+```bash
+cd packages
+cd client
+npm test
+```
