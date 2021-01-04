@@ -17,10 +17,9 @@ describe('<Lists />', () => {
       ],
     };
 
-    const { getByText, queryByText } = render(<Lists lists={items} />);
+    const { getAllByText } = render(<Lists lists={items} />);
 
-    expect(getByText('List Id 1').textContent).toEqual('List Id 1');
-    expect(getByText('List Id 4').textContent).toEqual('List Id 4');
-    expect(queryByText('List Id 2')).toBeNull();
+    const elements = getAllByText(/List Id/i);
+    expect(elements.length).toBe(2);
   });
 });

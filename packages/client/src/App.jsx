@@ -74,7 +74,7 @@ const App = () => {
                 <div className="lists-view">
                   <h1 className="header">Items List</h1>
                   <input className="search-bar" onChange={searchName} />
-                  <Lists data-testid="lists" lists={items} />
+                  <Lists lists={items} />
                 </div>
               )
           )

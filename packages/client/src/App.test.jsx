@@ -25,18 +25,19 @@ describe('<App />', () => {
   });
 
   it('rejects the axios request and reports an error', async () => {
-    axiosMock.get.mockRejectedValue('Async error');
+    axiosMock.get.mockRejectedValue({message: 'Async error'});
 
     const url = 'http://localhost:3001/items';
 
     const { getByText } = render(<App />);
 
-    expect(getByText(/Loading.../i).textContent).toBe('Loading...');
+    expect(getByText('Loading...').textContent).toBe('Loading...');
 
-    await act(async () => {
-      expect(axiosMock.get).toHaveBeenCalledTimes(1);
-      expect(axiosMock.get).toHaveBeenCalledWith(url);
-      await expect(axiosMock.get).rejects.toEqual('Async error');
-    });
+    const rejectedHeader = await waitFor(() => getByText('Async error'));
+
+    expect((rejectedHeader).textContent).toBe('Async error');
+
+    expect(axiosMock.get).toHaveBeenCalledTimes(1);
+    expect(axiosMock.get).toHaveBeenCalledWith(url);
   });
 });
