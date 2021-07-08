@@ -9,18 +9,19 @@ const App = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [defaultItems, setDefaultItems] = useState({});
   const [items, setItems] = useState({});
+  const [listIdFilter, setListIdFilter] = useState(new Set());
   const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
     setIsLoading(true);
-    axios.get('http://localhost:3001/items')
+    axios.get('https://fetch-hiring.s3.amazonaws.com/hiring.json')
       .then((response) => {
         // eslint-disable-next-line no-unreachable
-        const responseItems = response.data
+        const filteredItems = response.data
           .filter((item) => item.name)
           .sort(itemComparator);
 
-        const groupedItems = groupItems(responseItems);
+        const groupedItems = groupItems(filteredItems);
 
         setItems(groupedItems);
         setDefaultItems(groupedItems);
@@ -28,6 +29,16 @@ const App = () => {
       .catch((error) => setErrorMessage(error.message))
       .finally(() => setIsLoading(false));
   }, []);
+
+  useEffect(() => {
+    if (listIdFilter.size > 0) {
+      const filteredLists = {};
+      listIdFilter.forEach((listId) => {
+        filteredLists[listId] = defaultItems[listId];
+      });
+      setItems(filteredLists);
+    }
+  }, [listIdFilter, defaultItems]);
 
   let itemComparator = ((itemOne, itemTwo) => {
     const itemOneNumber = parseInt(itemOne.name.split(' ')[1], 10);
@@ -40,8 +51,20 @@ const App = () => {
     const filteredList = {};
 
     Object.keys(defaultItems).forEach((key) => {
+      const searchQuery = event.target.value.toLowerCase();
+
       const tempItemsList = defaultItems[key]
-        .filter((item) => item.name.toLowerCase().includes(event.target.value.toLowerCase()));
+        .map((item) => ({
+          ...item,
+          id: item.id.toString(),
+          name: item.name.toLowerCase(),
+        }))
+        .filter(({ id, name }) => {
+          const isNameIncluded = name.includes(searchQuery);
+          const isIdIncluded = id.includes(searchQuery);
+          return isNameIncluded || isIdIncluded;
+        });
+
       if (tempItemsList.length > 0) {
         filteredList[key] = tempItemsList;
       }
@@ -50,7 +73,7 @@ const App = () => {
     setItems(filteredList);
   };
 
-  let groupItems = (responseItems) => {
+  const groupItems = (responseItems) => {
     const groupedItems = {};
 
     responseItems.forEach((item) => {
@@ -60,6 +83,16 @@ const App = () => {
     });
 
     return groupedItems;
+  };
+
+  const changeListIdFilter = (newListId) => {
+    const allListIds = new Set(listIdFilter);
+    if (allListIds.has(newListId)) {
+      allListIds.delete(newListId);
+    } else {
+      allListIds.add(newListId);
+    }
+    setListIdFilter(allListIds);
   };
 
   return (
@@ -73,7 +106,22 @@ const App = () => {
               : (
                 <div className="lists-view">
                   <h1 className="header">Items List</h1>
-                  <input className="search-bar" onChange={searchName} />
+                  <input
+                    type="text"
+                    className="search-bar"
+                    onChange={searchName}
+                    placeholder="Search Items"
+                  />
+
+                  {Object.keys(defaultItems).map((listId) => (
+                    <button
+                      type="button"
+                      key={listId}
+                      onClick={() => changeListIdFilter(listId)}
+                    >
+                      {listId}
+                    </button>
+                  ))}
                   <Lists lists={items} />
                 </div>
               )

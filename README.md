@@ -8,7 +8,6 @@ Run the following in the terminal:
 git clone https://github.com/arredondop03/fetch.git
 cd fetch
 npm install
-npm run dependencies
 npm start
 ```
 
@@ -18,6 +17,5 @@ Run the following in the terminal:
 
 ```bash
 cd packages
-cd client
 npm test
 ```
